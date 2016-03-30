@@ -13,22 +13,48 @@
 
 #pragma once
 
-#include <iostream>
+// Windows or Other
+#if defined(WIN32) || defined(_WINDOWS)
+#include <WinSock2.h>
+#else
 #include <sys/fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#endif
+
+#include <iostream>
+
+const int LISTEN_NUM = 5;
+const int BUFFER_SIZE = 1024;
 
 
 class Socket {
 private:
+#if defined(WIN32) || defined(_WINDOWS)
+  WSAData wsa_;
+  SOCKET  sock_;
+#else
   int sock_;
+#endif
   sockaddr_in addr_;
-  
-  const int LISTEN_NUM    = 5;
-  const int BUFFER_SIZE   = 1024;
+
+/*
+  close Socket func
+*/
+#if defined(WIN32) || defined(_WINDOWS)
+  void closeSock(SOCKET sock) {
+    WSACleanup();
+    ::closesocket(sock_);
+  }
+#else
+  void closeSock(SOCKET sock) {
+    // close sock
+    ::close(sock_);
+  }
+#endif
   
 public:
   Socket();

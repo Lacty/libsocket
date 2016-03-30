@@ -4,19 +4,21 @@
 
 
 Socket::Socket() {
+#if defined(WIN32) || defined(_WINDOWS)
+  if (WSAStartup(MAKEWORD(2, 0), &wsa_)) assert(!"WSAStartup failed");
   // reset sock var
   sock_ = 0;
-  
+#else
+  // reset sock var
+  sock_ = 0;
   // clean addr array
   memset(&addr_, 0, sizeof(addr_));
+#endif
 }
 
 Socket::~Socket() {
   if (is_valid()) {
-    // shut down sock
-    ::shutdown(sock_, SHUT_RDWR);
-    // close sock
-    ::close(sock_);
+    closeSock(sock_);
   }
 }
 
@@ -51,7 +53,7 @@ bool Socket::bind(const int port) {
   // report err is can not bind sock
   if (-1 == ::bind(sock_, (sockaddr*)&addr_, sizeof(addr_))) {
     assert(!"Socket::bin() err");
-    close(sock_);
+    closeSock(sock_);
     return false;
   }
   
@@ -66,7 +68,7 @@ bool Socket::listen() {
   // report err if can not listen on sock
   if (-1 == ::listen(sock_, LISTEN_NUM)) {
     assert(!"Socket::listen() err");
-    close(sock_);
+    closeSock(sock_);
     return false;
   }
   
@@ -79,7 +81,7 @@ bool Socket::accept(Socket &connect) {
   // report err if accept is failed
   if (0 > connect.sock_) {
     assert(!"Socket::accept() err");
-    close(connect.sock_);
+    closeSock(connect.sock_);
     return false;
   }
   
@@ -108,7 +110,7 @@ bool Socket::connect(const std::string &address, const int port) {
   // try to connect throught sock
   if (-1 == ::connect(sock_, (sockaddr*)&addr_, sizeof(addr_))) {
     assert(!"Socket::connect() err");
-    close(sock_);
+    closeSock(sock_);
     return false;
   }
   
@@ -148,6 +150,8 @@ bool Socket::recv(std::string &data) {
     data.clear();
     return false;
   }
+
+  data.resize(result);
   
   return true;
 }
