@@ -50,7 +50,7 @@ private:
     ::closesocket(sock_);
   }
 #else
-  void closeSock(SOCKET sock) {
+  void closeSock(int sock) {
     // close sock
     ::close(sock_);
   }
