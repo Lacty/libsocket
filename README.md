@@ -1,3 +1,3 @@
 # libsocket
 
-now supporting mac only
+this library supporting Win and Mac
