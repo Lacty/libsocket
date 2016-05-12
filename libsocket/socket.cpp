@@ -50,6 +50,9 @@ bool Socket::bind(const int port) {
   addr_.sin_port        = htons(port);
   addr_.sin_addr.s_addr = INADDR_ANY;
   
+  int yes = 1;
+  setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (const char *)&yes, sizeof(yes));
+  
   // report err is can not bind sock
   if (-1 == ::bind(sock_, (sockaddr*)&addr_, sizeof(addr_))) {
     assert(!"Socket::bin() err");
@@ -179,7 +182,7 @@ bool Socket::send(const std::string &data) {
 std::string Socket::recv() {
   std::string data;
   recv(data);
-  return std::move(data);
+  return data;
 }
 
 

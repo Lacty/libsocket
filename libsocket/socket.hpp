@@ -23,6 +23,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 #endif
 
 #include <iostream>
